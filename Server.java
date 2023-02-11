@@ -13,7 +13,6 @@ public class Server extends Thread{
     public void run(){
         try{
             ServerSocket server = new ServerSocket(12345);
-            neighbors = new ArrayList<String>();
             
             ArrayList<Funcionario> funcionarios = new ArrayList<Funcionario>();
 
