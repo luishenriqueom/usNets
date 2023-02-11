@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class Node {
     
     //Vizinhos de um nó
+    //obs: depois usar o array dinamicamente
     private static ArrayList<String> neighbors;
     public static void main(String[] args){
         int opc=0;
@@ -22,7 +23,7 @@ public class Node {
             sc.nextLine();
 
             switch(opc){
-                case 1:{
+                case 1:{//entrar na rede
                     System.out.println("Digite o endereço ip de um nó para se conectar:");
                     String ip = sc.nextLine();
                     System.out.println("Digite a porta do nó para se conectar:");
@@ -31,13 +32,21 @@ public class Node {
                     new Client(ip, port, req, neighbors).start();
                     break;
                 }
-                case 2:{
+                case 2:{//sair da rede
+                    Object[] req1 = {ServerProcessClient.OUT_NETWORK, neighbors.get(0)};
+                    Object[] req2 = {ServerProcessClient.OUT_NETWORK, neighbors.get(1)};
+
+                    new Client(neighbors.get(0), 12345, req2, neighbors).start();
+                    new Client(neighbors.get(1), 12345, req1, neighbors).start();
+                    System.out.println("Desconectando filial...");
+                    while(neighbors.size()!=0);
+                    System.out.println("Desconectado. Vizinhos:"+neighbors);
                     break;
                 }
-                case 3:{
+                case 3:{//procurar na rede
                     break;
                 }
-                case 4:{
+                case 4:{//CPF encontrado
                     break;
                 }
                 case 5:{
@@ -45,6 +54,7 @@ public class Node {
                     break;
                 }
                 case 6:{
+                    System.out.println("Processo finalizado");
                     break;
                 }
                 default:{

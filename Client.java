@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 public class Client extends Thread{
     
+    private Socket client;
+
     private String HOST;
     private int PORT;
     private Object[] MESSAGE;
@@ -22,7 +24,7 @@ public class Client extends Thread{
 
     public void run(){
         try{
-            Socket client = new Socket(HOST, PORT);
+            client = new Socket(HOST, PORT);
 
             ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(client.getInputStream());
@@ -44,13 +46,18 @@ public class Client extends Thread{
                         neighbors.add(client.getInetAddress().getHostAddress());
                         neighbors.add((String) resp[1]);
                     }
+                    System.out.println("Vizinhos:"+neighbors);
+                    break;
+                }
+                case ServerProcessClient.OUT_OK:{
+                    neighbors.remove(client.getInetAddress().getHostAddress());                    
                     break;
                 }
             }
             out.close();
 
         }catch(Exception e){
-            System.out.println(e.getMessage());
+            System.out.println(client.getInetAddress().getHostAddress()+"::"+e.getMessage());
         }
     }
 

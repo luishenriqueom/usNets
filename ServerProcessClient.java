@@ -13,6 +13,7 @@ public class ServerProcessClient extends Thread{
     public static final int OUT_NETWORK = 1;
     public static final int SEARCH = 2;
     public static final int FOUND_SEARCH = 3;
+    public static final int OUT_OK = 4;
 
     public ServerProcessClient(Socket client, ArrayList<Funcionario> funcionarios, ArrayList<String> neighbors){
         this.client = client;
@@ -57,9 +58,15 @@ public class ServerProcessClient extends Thread{
                         int index = neighbors.indexOf(client.getInetAddress().getHostAddress());
                         neighbors.set(index, (String) clientReq[1]);
                     }
+                    System.out.println("Vizinhos:"+neighbors);
                     break;
                 }
                 case OUT_NETWORK:{
+                    int index = neighbors.indexOf(client.getInetAddress().getHostAddress());
+                    neighbors.set(index, (String) clientReq[1]);
+                    Object[] res = {OUT_OK, null};
+                    out.flush();
+                    out.writeObject(res);
                     break;
                 }
                 case SEARCH:{
@@ -71,10 +78,6 @@ public class ServerProcessClient extends Thread{
             }
             
             out.close();
-            /* out.flush();
-            out.writeObject("Hello World");
-            out.close();
-            client.close(); */
         }catch (Exception e){
             System.out.println("Error:: Thread ProcessClient - "+e.getMessage());
         }
