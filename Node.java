@@ -33,14 +33,20 @@ public class Node {
                     break;
                 }
                 case 2:{//sair da rede
-                    Object[] req1 = {ServerProcessClient.OUT_NETWORK, neighbors.get(0)};
-                    Object[] req2 = {ServerProcessClient.OUT_NETWORK, neighbors.get(1)};
+                    if(neighbors.get(0)==neighbors.get(1)){
+                        Object[] req = {ServerProcessClient.OUT_NETWORK, neighbors.get(0)};
+                        new Client(neighbors.get(0), 12345, req, neighbors).start();
+                        neighbors.clear();
+                        System.out.println("Rede desfeita!");
+                    }else{
+                        Object[] req1 = {ServerProcessClient.OUT_NETWORK, neighbors.get(0)};
+                        Object[] req2 = {ServerProcessClient.OUT_NETWORK, neighbors.get(1)};
 
-                    new Client(neighbors.get(0), 12345, req2, neighbors).start();
-                    new Client(neighbors.get(1), 12345, req1, neighbors).start();
-                    System.out.println("Desconectando filial...");
-                    while(neighbors.size()!=0);
-                    System.out.println("Desconectado. Vizinhos:"+neighbors);
+                        new Client(neighbors.get(0), 12345, req2, neighbors).start();
+                        new Client(neighbors.get(1), 12345, req1, neighbors).start();
+                        //neighbors.clear();
+                        System.out.println("Rede desfeita!");
+                    }
                     break;
                 }
                 case 3:{//procurar na rede

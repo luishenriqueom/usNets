@@ -23,7 +23,10 @@ public class ServerProcessClient extends Thread{
 
     public void run(){
         try{
-            System.out.println("Cliente conectado. IP:"+client.getInetAddress().getHostAddress());
+            //System.out.println("RE IP:"+client.getInetAddress().getHostAddress());
+
+            String clientIP = client.getInetAddress().getHostAddress();
+
             ObjectInputStream in = new ObjectInputStream(client.getInputStream());
             ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
                         
@@ -35,38 +38,50 @@ public class ServerProcessClient extends Thread{
                 case ENTERING_NETWORK:{
                     if(clientReq[1]==null){
                         if(neighbors.size()==0){
-                            //System.out.println("entrei");
-                            neighbors.add(client.getInetAddress().getHostAddress());
-                            neighbors.add(client.getInetAddress().getHostAddress());
+                            System.out.println("Formando rede com:"+clientIP);
+                            neighbors.add(clientIP);
+                            neighbors.add(clientIP);
                             //System.out.println(neighbors);
                             Object[] res = {ENTERING_NETWORK, null};
                             out.flush(); //limpar buffer
                             out.writeObject(res);
                         }else{
-                            Object[] req = {ENTERING_NETWORK, client.getInetAddress().getHostAddress()};
+                            System.out.println(clientIP+" solicitou entrar na rede");
+                            Object[] req = {ENTERING_NETWORK, clientIP};
 
                             new Client(neighbors.get(1), 12345, req, neighbors).start();
                             
                             Object[] res = {ENTERING_NETWORK, neighbors.get(1)};
 
-                            neighbors.set(1, client.getInetAddress().getHostAddress());
+                            neighbors.set(1, clientIP);
                             
                             out.flush();
                             out.writeObject(res);                            
                         }
                     }else{
-                        int index = neighbors.indexOf(client.getInetAddress().getHostAddress());
+                        int index = neighbors.indexOf(clientIP);
                         neighbors.set(index, (String) clientReq[1]);
                     }
                     System.out.println("Vizinhos:"+neighbors);
                     break;
                 }
                 case OUT_NETWORK:{
-                    int index = neighbors.indexOf(client.getInetAddress().getHostAddress());
-                    neighbors.set(index, (String) clientReq[1]);
-                    Object[] res = {OUT_OK, null};
-                    out.flush();
-                    out.writeObject(res);
+                    System.out.println("Pedido de saida na rede recebido de "+clientIP);
+                    if(neighbors.size()==0){
+                        System.out.println("Filial nao conetada a rede.");
+                    }else{
+                        if(neighbors.get(0).equals(clientIP) && neighbors.get(1).equals(clientIP)){
+                            neighbors.clear();
+                            System.out.println(clientIP+" desfez a rede!");
+                        }else{
+                            int index = neighbors.indexOf(clientIP);
+                            neighbors.set(index, (String) clientReq[1]);
+                            Object[] res = {OUT_OK, null};
+                            System.out.println("Vizinhos:"+neighbors);
+                            out.flush();
+                            out.writeObject(res);
+                        }                        
+                    }
                     break;
                 }
                 case SEARCH:{

@@ -39,18 +39,19 @@ public class Client extends Thread{
                 case ServerProcessClient.ENTERING_NETWORK:{
                     if(resp[1]==null){
                         if(neighbors.size()==0){
-                            neighbors.add(client.getInetAddress().getHostAddress());
-                            neighbors.add(client.getInetAddress().getHostAddress());
+                            neighbors.add(HOST);
+                            neighbors.add(HOST);
                         }
                     }else{
-                        neighbors.add(client.getInetAddress().getHostAddress());
+                        neighbors.add(HOST);
                         neighbors.add((String) resp[1]);
                     }
                     System.out.println("Vizinhos:"+neighbors);
                     break;
                 }
                 case ServerProcessClient.OUT_OK:{
-                    neighbors.remove(client.getInetAddress().getHostAddress());                    
+                    neighbors.remove(HOST); 
+                    System.out.println(HOST+" removido!");                   
                     break;
                 }
             }
