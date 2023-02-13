@@ -84,7 +84,11 @@ public class ServerProcessClient extends Thread{
                     }
                     break;
                 }
-                case SEARCH:{
+                case SEARCH:{                    
+                    System.out.println("Pedido de busca recebido de "+clientIP);
+                    Object[] queryCPF = (Object[]) clientReq[1];
+                    System.out.println("CPF buscado:"+queryCPF[0]+
+                    "\nQuem está solicitando:"+queryCPF[1]);
                     break;
                 }
                 case FOUND_SEARCH:{

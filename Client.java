@@ -29,6 +29,15 @@ public class Client extends Thread{
             ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(client.getInputStream());
 
+            switch((int)MESSAGE[0]){
+                case ServerProcessClient.SEARCH:{
+                    //Object[] search = (Object[]) MESSAGE[1];
+                    //search[1] = client.getLocalAddress().getHostAddress();
+                    ((Object[])MESSAGE[1])[1] = client.getLocalAddress().getHostAddress();
+                    break;
+                }
+            }
+
             out.flush();
             out.writeObject(MESSAGE);
 

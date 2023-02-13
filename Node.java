@@ -50,6 +50,13 @@ public class Node {
                     break;
                 }
                 case 3:{//procurar na rede
+                    System.out.println("Digite o CPF a ser buscado:");
+                    String CPF = sc.nextLine();
+                    //Object[][] req = new Object()/
+                    Object[] msg = {CPF, null};
+                    Object[] req = {ServerProcessClient.SEARCH, msg};
+                    new Client(neighbors.get(1), 12345, req, neighbors).start();
+                    System.out.println("Buscando...");
                     break;
                 }
                 case 4:{//CPF encontrado
