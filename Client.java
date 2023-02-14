@@ -13,13 +13,13 @@ public class Client extends Thread{
     private String HOST;
     private int PORT;
     private Object[] MESSAGE;
-    private ArrayList<String> neighbors;
+    // private ArrayList<String> neighbors;
 
-    public Client(String HOST, int PORT, Object[] MESSAGE, ArrayList<String> neighbors){
+    public Client(String HOST, int PORT, Object[] MESSAGE){
         this.HOST = HOST;
         this.PORT = PORT;
         this.MESSAGE = MESSAGE;
-        this.neighbors = neighbors;
+        // this.neighbors = neighbors;
     }
 
     public void run(){
@@ -29,14 +29,14 @@ public class Client extends Thread{
             ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(client.getInputStream());
 
-            switch((int)MESSAGE[0]){
-                case ServerProcessClient.SEARCH:{
-                    //Object[] search = (Object[]) MESSAGE[1];
-                    //search[1] = client.getLocalAddress().getHostAddress();
-                    ((Object[])MESSAGE[1])[1] = client.getLocalAddress().getHostAddress();
-                    break;
-                }
-            }
+            // switch((int)MESSAGE[0]){
+            //     case ServerProcessClient.SEARCH:{
+            //         //Object[] search = (Object[]) MESSAGE[1];
+            //         //search[1] = client.getLocalAddress().getHostAddress();
+            //         ((Object[])MESSAGE[1])[1] = client.getLocalAddress().getHostAddress();
+            //         break;
+            //     }
+            // }
 
             out.flush();
             out.writeObject(MESSAGE);
@@ -47,19 +47,19 @@ public class Client extends Thread{
             switch(type){
                 case ServerProcessClient.ENTERING_NETWORK:{
                     if(resp[1]==null){
-                        if(neighbors.size()==0){
-                            neighbors.add(HOST);
-                            neighbors.add(HOST);
+                        if(Node.neighbors.size()==0){
+                            Node.neighbors.add(HOST);
+                            Node.neighbors.add(HOST);
                         }
                     }else{
-                        neighbors.add(HOST);
-                        neighbors.add((String) resp[1]);
+                        Node.neighbors.add(HOST);
+                        Node.neighbors.add((String) resp[1]);
                     }
-                    System.out.println("Vizinhos:"+neighbors);
+                    System.out.println("Vizinhos:"+Node.neighbors);
                     break;
                 }
                 case ServerProcessClient.OUT_OK:{
-                    neighbors.remove(HOST); 
+                    Node.neighbors.remove(HOST); 
                     System.out.println(HOST+" removido!");                   
                     break;
                 }

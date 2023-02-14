@@ -36,4 +36,8 @@ public class Funcionario {
         return Nome;
     }
 
+    public String toString(){
+        return "Nome:"+Nome+"\nCPF:"+CPF+"\nIdade:"+Idade;
+    }
+
 }
