@@ -11,15 +11,12 @@ public class Client extends Thread{
     private Socket client;
 
     private String HOST;
-    private int PORT;
+    private final int PORT = 12345;
     private Object[] MESSAGE;
-    // private ArrayList<String> neighbors;
 
-    public Client(String HOST, int PORT, Object[] MESSAGE){
+    public Client(String HOST, Object[] MESSAGE){
         this.HOST = HOST;
-        this.PORT = PORT;
         this.MESSAGE = MESSAGE;
-        // this.neighbors = neighbors;
     }
 
     public void run(){
@@ -46,20 +43,20 @@ public class Client extends Thread{
 
             switch(type){
                 case ServerProcessClient.ENTERING_NETWORK:{
-                    if(resp[1]==null){
-                        if(Node.neighbors.size()==0){
-                            Node.neighbors.add(HOST);
-                            Node.neighbors.add(HOST);
+                    if(resp[2]==null){
+                        if(Filial.neighbors.size()==0){
+                            Filial.neighbors.add(HOST);
+                            Filial.neighbors.add(HOST);
                         }
                     }else{
-                        Node.neighbors.add(HOST);
-                        Node.neighbors.add((String) resp[1]);
+                        Filial.neighbors.add(HOST);
+                        Filial.neighbors.add((String) resp[2]);
                     }
-                    System.out.println("Vizinhos:"+Node.neighbors);
+                    System.out.println("Vizinhos:"+Filial.neighbors);
                     break;
                 }
                 case ServerProcessClient.OUT_OK:{
-                    Node.neighbors.remove(HOST); 
+                    Filial.neighbors.remove(HOST); 
                     System.out.println(HOST+" removido!");                   
                     break;
                 }
