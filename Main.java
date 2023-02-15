@@ -7,20 +7,22 @@ public class Main {
     
     private static Scanner sc;
 
-    public static void main(String[] args){
-        getMyIP();
+    public static void main(String[] args){        
+        sc = new Scanner(System.in);
+
+        System.out.println("Digite o nome da sua filial:");
+        Node.filial = new Filial(sc.nextLine().toUpperCase());
+        System.out.println("FILIAL \""+Node.filial.nome+"\"");
+
+        //getMyIP();
+        Node.filial.IP = "192.168.100.156";
         System.out.println("SEU IP:"+Node.filial.IP);
 
         Node.neighbors = new ArrayList<Filial>();
         Node.filial.funcionarios = new ArrayList<Funcionario>();
         
-        System.out.println("Digite o nome da sua filial:");
-        Node.filial = new Filial(sc.nextLine());
-        System.out.println(Node.filial.nome.toUpperCase());
-        
         new Server().start();  
         
-        sc = new Scanner(System.in);
         int opc=0;
         do{
             System.out.println("OPCOES:");
@@ -32,46 +34,59 @@ public class Main {
                 case 1:{//entrar na rede
                     System.out.println("Digite o endereço ip de uma filial para se conectar:");
                     String ip = sc.nextLine();
-                    Object[] req = {ServerProcessClient.ENTERING_NETWORK, Node.filial, null};
+                    Object[] req = {ServerProcessClient.ENTERING_NETWORK, Node.filial, 0};
                     new Client(ip, req).start();
                     break;
                 }
                 case 2:{//sair da rede
-                    if(Node.neighbors.get(0)==Node.neighbors.get(1)){
-                        Object[] req = {ServerProcessClient.OUT_NETWORK, Node.filial.nome, Node.neighbors.get(0)};
-                        new Client(Node.neighbors.get(0), req).start();
-                        Node.neighbors.clear();
+                    if(Node.neighbors.get(0).IP.equals(Node.neighbors.get(1).IP)){
+                        Object[] req = {ServerProcessClient.OUT_NETWORK, Node.filial, 0};
+                        new Client(Node.neighbors.get(0).IP, req).start();
                         System.out.println("Rede desfeita!");
                     }else{
-                        Object[] req1 = {ServerProcessClient.OUT_NETWORK, Filial.nome, Filial.neighbors.get(0)};
-                        Object[] req2 = {ServerProcessClient.OUT_NETWORK, Filial.nome, Filial.neighbors.get(1)};
+                        Object[] req1 = {ServerProcessClient.OUT_NETWORK, Node.neighbors.get(0), 1};
+                        Object[] req2 = {ServerProcessClient.OUT_NETWORK, Node.neighbors.get(1), 1};
 
-                        new Client(Filial.neighbors.get(0), req2).start();
-                        new Client(Filial.neighbors.get(1), req1).start();
-                        //neighbors.clear();
-                        System.out.println("Rede desfeita!");
+                        new Client(Node.neighbors.get(0).IP, req2).start();
+                        new Client(Node.neighbors.get(1).IP, req1).start();
+                        System.out.println("Saiu da rede!");
                     }
+                    Node.neighbors.clear();
                     break;
                 }
                 case 3:{//procurar funcionario
                     System.out.println("Digite o CPF a ser buscado:");
                     String CPF = sc.nextLine();
 
-                    Iterator<Funcionario> ite = Filial.funcionarios.iterator();
+                    Iterator<Funcionario> ite = Node.filial.funcionarios.iterator();
                     boolean found=false;
                     while(ite.hasNext()){
                         Funcionario func = ite.next();
                         if(func.getCPF().equals(CPF)){
                             found=true;
-                            System.out.println("CPF encontrado no proprio dispositivo. Dados\n"+func.toString());                            
+                            System.out.println("CPF encontrado na propria filial. Dados\n"+func.toString());                            
                             break;
                         }
                     }
                     if(!found){
-                        //Object[][] req = new Object()/
-                        Object[] msg = {CPF, Filial.myIP};
-                        Object[] req = {ServerProcessClient.SEARCH, Filial.nome, msg};
-                        new Client(Filial.neighbors.get(1), req).start();
+                        Iterator<Filial> neighborFiliais = Node.neighbors.iterator();
+                        while(neighborFiliais.hasNext()){
+                            ite = neighborFiliais.next().funcionarios.iterator();
+                            while(ite.hasNext()){
+                                Funcionario func = ite.next();
+                                if(func.getCPF().equals(CPF)){
+                                    found=true;
+                                    System.out.println("CPF encontrado na filial vizinha . Dados\n"+func.toString()); 
+                                    break; 
+                                }
+                            }
+                            if(found) break;
+                        }
+                    }
+                    if(!found){
+                        Object[] msg = {CPF, Node.filial.IP};
+                        Object[] req = {ServerProcessClient.SEARCH, msg};
+                        new Client(Node.neighbors.get(1).IP, req).start();
                         System.out.println("Buscando...");
                     }
                     break;
@@ -82,7 +97,7 @@ public class Main {
                 }
                 case 5:{//ver funcionarios
                     System.out.println("Funcionarios cadastrados:");
-                    Iterator<Funcionario> ite = Filial.funcionarios.iterator();
+                    Iterator<Funcionario> ite = Node.filial.funcionarios.iterator();
                     while(ite.hasNext()){
                         System.out.println(ite.next());
                         System.out.println("-----------------");
@@ -90,7 +105,7 @@ public class Main {
                     break;
                 }
                 case 6:{
-                    System.out.println(Filial.neighbors);
+                    System.out.println(Node.neighbors);
                     break;
                 }
                 case 7:{
@@ -117,7 +132,7 @@ public class Main {
         System.out.println("Digite a idade do funcionario:");
         int idade = sc.nextInt();
         sc.nextLine();
-        Filial.funcionarios.add(new Funcionario(CPF, nome, idade));
+        Node.filial.funcionarios.add(new Funcionario(CPF, nome, idade));
         System.out.println("Funcionario adicionado!");
     }
 
@@ -137,6 +152,7 @@ public class Main {
         }catch(SocketException e){
             e.printStackTrace();
         }
+
     }
 
 }

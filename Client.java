@@ -1,10 +1,7 @@
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
+
 
 public class Client extends Thread{
     
@@ -26,38 +23,27 @@ public class Client extends Thread{
             ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(client.getInputStream());
 
-            // switch((int)MESSAGE[0]){
-            //     case ServerProcessClient.SEARCH:{
-            //         //Object[] search = (Object[]) MESSAGE[1];
-            //         //search[1] = client.getLocalAddress().getHostAddress();
-            //         ((Object[])MESSAGE[1])[1] = client.getLocalAddress().getHostAddress();
-            //         break;
-            //     }
-            // }
-
             out.flush();
             out.writeObject(MESSAGE);
 
             Object[] resp = (Object[]) in.readObject();
             int type = (int) resp[0];
 
+            //Trata resposta do servidor no lado do cliente
             switch(type){
                 case ServerProcessClient.ENTERING_NETWORK:{
-                    if(resp[2]==null){
-                        if(Filial.neighbors.size()==0){
-                            Filial.neighbors.add(HOST);
-                            Filial.neighbors.add(HOST);
+                    if((int) resp[2]==0){
+                        Filial filialResp = (Filial) resp[1];
+                        if(Node.neighbors.size()==0){
+                            Node.neighbors.add(filialResp);
+                            Node.neighbors.add(filialResp);
                         }
                     }else{
-                        Filial.neighbors.add(HOST);
-                        Filial.neighbors.add((String) resp[2]);
+                        Object[] filiaisResp = (Object[]) resp[1];
+                        Node.neighbors.add((Filial)filiaisResp[0]);
+                        Node.neighbors.add((Filial)filiaisResp[1]);
                     }
-                    System.out.println("Vizinhos:"+Filial.neighbors);
-                    break;
-                }
-                case ServerProcessClient.OUT_OK:{
-                    Filial.neighbors.remove(HOST); 
-                    System.out.println(HOST+" removido!");                   
+                    System.out.println("Vizinhos:"+Node.neighbors);
                     break;
                 }
             }
